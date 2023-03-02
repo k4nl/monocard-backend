@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
-import Utils from 'src/utils';
+import Utils from '../utils/Bcrypt';
 import { CustomError } from 'src/utils/CustomError';
 
 @Injectable()
