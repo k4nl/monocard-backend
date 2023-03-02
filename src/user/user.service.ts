@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
-import Utils from 'src/utils';
+import Bcrypt from 'src/utils/Bcrypt';
 import { CustomError } from 'src/utils/CustomError';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const response = await this.userModel.create({
       name: createUserDto.name,
-      password: (await Utils.hashPassword(createUserDto.password)).toString(),
+      password: (await Bcrypt.hashPassword(createUserDto.password)).toString(),
     });
     return {
       name: response.name,
@@ -40,7 +40,7 @@ export class UserService {
       const response = await this.userModel.update(
         {
           password: (
-            await Utils.hashPassword(updateUserDto.password)
+            await Bcrypt.hashPassword(updateUserDto.password)
           ).toString(),
         },
         { where: { id } },
