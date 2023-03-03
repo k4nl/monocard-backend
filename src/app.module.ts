@@ -4,9 +4,11 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { PokemonModule } from './pokemon/pokemon.module';
+import { PokemarketModule } from './pokemarket/pokemarket.module';
 
 @Module({
-  imports: [DatabaseModule, UserModule, AuthModule],
+  imports: [DatabaseModule, UserModule, PokemonModule, AuthModule, PokemarketModule],
   controllers: [AppController],
   providers: [AppService],
 })

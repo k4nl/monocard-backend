@@ -3,14 +3,15 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { PokemonService } from './pokemon.service';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
-import { UpdatePokemonDto } from './dto/update-pokemon.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('pokemon')
 export class PokemonController {
@@ -21,18 +22,24 @@ export class PokemonController {
     return this.pokemonService.create(createPokemonDto);
   }
 
-  @Get('/user/:id')
-  findAll(@Param('id') id: string, @Query() query: any) {
-    return this.pokemonService.findAll(id, query);
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  findAll(@Req() req: any, @Query() query: any) {
+    const { user } = req;
+    return this.pokemonService.findAll(user, query);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pokemonService.findOne(+id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    const { user } = req;
+    return this.pokemonService.findOne(+id, user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pokemonService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    const { user } = req;
+    return this.pokemonService.remove(+id, user);
   }
 }

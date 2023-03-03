@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize/dist/common';
-import { Sequelize } from 'sequelize';
 import { Pagination } from 'src/utils/Pagination';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
-import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 import { Pokemon } from './entities/pokemon.entity';
 import { PokeApiService } from './pokeapi.service';
+import Verifier from './verifier';
 
 @Injectable()
 export class PokemonService {
@@ -14,6 +13,10 @@ export class PokemonService {
     private pokemonModel: typeof Pokemon,
   ) {}
   async create(createPokemonDto: CreatePokemonDto) {
+    const pokeApiResponse = await PokeApiService.fetchPokemonInfo(
+      createPokemonDto.pokemon_id,
+    );
+    Verifier.verifyResponse(pokeApiResponse);
     const response = await this.pokemonModel.create({
       poke_api_id: createPokemonDto.pokemon_id,
       user_id: createPokemonDto.user_id,
@@ -21,10 +24,10 @@ export class PokemonService {
     return response;
   }
 
-  async findAll(id: string, query: any) {
+  async findAll(user: any, query: any) {
     const pagination = new Pagination(query.page, query.total).getPagination();
     const response = await this.pokemonModel.findAndCountAll({
-      where: { user_id: Number(id) },
+      where: { user_id: user.id },
       limit: pagination.limit,
       offset: pagination.offset,
     });
@@ -33,19 +36,23 @@ export class PokemonService {
     );
     return {
       content: formatedResponse,
-      page: pagination.page,
-      total: response.count,
+      actualPage: pagination.page,
+      totalPages: Math.ceil(response.count / pagination.limit),
+      totalContent: response.count,
     };
   }
 
-  findOne(id: number) {
-    const response = this.pokemonModel.findOne({
-      where: { id },
+  async findOne(id: number, user: any) {
+    const response = await this.pokemonModel.findOne({
+      where: { id, user_id: user.id },
     });
     return response;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} pokemon`;
+  async remove(id: number, user: any) {
+    const response = await this.pokemonModel.destroy({
+      where: { id, user_id: user.id },
+    });
+    return response;
   }
 }

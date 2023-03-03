@@ -24,14 +24,13 @@ export class Pagination {
 
   calculateOffset() {
     const offset = Math.round((Number(this.page) - 1) * Number(this.total));
-    if (offset > Number(this.total)) return Number(this.total) - 10;
+    if (offset >= Number(this.total)) return Number(this.total) - 10;
     return offset;
   }
 
   getPagination() {
     this.validate();
     const offset = this.calculateOffset();
-    console.log('OFFSET', offset);
     return { offset, total: this.total, limit: 10, page: Number(this.page) };
   }
 }
