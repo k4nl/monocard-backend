@@ -6,9 +6,10 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { PokemonModule } from './pokemon/pokemon.module';
 import { PokemarketModule } from './pokemarket/pokemarket.module';
+import { PlayerbankModule } from './playerbank/playerbank.module';
 
 @Module({
-  imports: [DatabaseModule, UserModule, PokemonModule, AuthModule, PokemarketModule],
+  imports: [DatabaseModule, UserModule, PokemonModule, AuthModule, PokemarketModule, PlayerbankModule],
   controllers: [AppController],
   providers: [AppService],
 })
