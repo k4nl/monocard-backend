@@ -1,34 +1,47 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { PlayerbankService } from './playerbank.service';
 import { CreatePlayerbankDto } from './dto/create-playerbank.dto';
-import { UpdatePlayerbankDto } from './dto/update-playerbank.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Controller('playerbank')
 export class PlayerbankController {
   constructor(private readonly playerbankService: PlayerbankService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPlayerbankDto: CreatePlayerbankDto) {
-    return this.playerbankService.create(createPlayerbankDto);
+  create(@Body() createPlayerbankDto: CreatePlayerbankDto, @Req() req: any) {
+    try {
+      return this.playerbankService.create(createPlayerbankDto, req.user);
+    } catch (error) {
+      return error;
+    }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.playerbankService.findAll();
+  findAll(@Req() req: any) {
+    try {
+      return this.playerbankService.findAll(req.user);
+    } catch (error) {
+      return error;
+    }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.playerbankService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePlayerbankDto: UpdatePlayerbankDto) {
-    return this.playerbankService.update(+id, updatePlayerbankDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.playerbankService.remove(+id);
+  findOne(@Param('id') id: string, @Req() req: any) {
+    try {
+      return this.playerbankService.findOne(+id, req.user);
+    } catch (error) {
+      return error;
+    }
   }
 }

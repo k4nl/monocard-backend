@@ -10,7 +10,15 @@ import { PlayerbankModule } from './playerbank/playerbank.module';
 import { TypetransactionsModule } from './typetransactions/typetransactions.module';
 
 @Module({
-  imports: [DatabaseModule, UserModule, PokemonModule, AuthModule, PokemarketModule, PlayerbankModule, TypetransactionsModule],
+  imports: [
+    DatabaseModule,
+    UserModule,
+    PokemonModule,
+    AuthModule,
+    PokemarketModule,
+    PlayerbankModule,
+    TypetransactionsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

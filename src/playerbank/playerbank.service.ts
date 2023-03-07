@@ -1,26 +1,54 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePlayerbankDto } from './dto/create-playerbank.dto';
-import { UpdatePlayerbankDto } from './dto/update-playerbank.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { Playerbank } from './entities/playerbank.entity';
+import { User } from 'src/user/entities/user.entity';
+import { Typetransaction } from 'src/typetransactions/entities/typetransaction.entity';
 
 @Injectable()
 export class PlayerbankService {
-  create(createPlayerbankDto: CreatePlayerbankDto) {
-    return 'This action adds a new playerbank';
+  constructor(
+    @InjectModel(Playerbank)
+    private playerbankModel: typeof Playerbank,
+  ) {}
+
+  async create(createPlayerbankDto: CreatePlayerbankDto, user: any) {
+    const response = await this.playerbankModel.create({
+      user_id: user.id,
+      ...createPlayerbankDto,
+    });
+    return response;
   }
 
-  findAll() {
-    return `This action returns all playerbank`;
+  async findAll(user: any) {
+    const response = await this.playerbankModel.findAll({
+      where: { user_id: user.id },
+      attributes: ['id', 'amount', 'createdAt', 'updatedAt'],
+      include: [
+        { model: User, attributes: ['id', 'name'], as: 'user' },
+        {
+          model: Typetransaction,
+          attributes: ['id', 'name'],
+          as: 'typetransaction',
+        },
+      ],
+    });
+    return response;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} playerbank`;
-  }
-
-  update(id: number, updatePlayerbankDto: UpdatePlayerbankDto) {
-    return `This action updates a #${id} playerbank`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} playerbank`;
+  async findOne(id: number, user: any) {
+    const response = await this.playerbankModel.findOne({
+      where: { id, user_id: user.id },
+      attributes: ['id', 'amount', 'createdAt', 'updatedAt'],
+      include: [
+        { model: User, attributes: ['id', 'name'], as: 'user' },
+        {
+          model: Typetransaction,
+          attributes: ['id', 'name'],
+          as: 'typetransaction',
+        },
+      ],
+    });
+    return response;
   }
 }

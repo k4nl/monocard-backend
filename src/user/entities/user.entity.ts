@@ -13,4 +13,7 @@ export class User extends Model<User> {
 
   @Column({ allowNull: false })
   password: string;
+
+  @Column({ allowNull: false, defaultValue: 0 })
+  balance: number;
 }
