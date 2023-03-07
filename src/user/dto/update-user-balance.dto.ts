@@ -1,5 +1,4 @@
-import { IsNumber, Min } from 'class-validator';
-import { Max } from 'sequelize-typescript';
+import { IsNumber, Min, Max } from 'class-validator';
 
 export class UpdateUserBalanceDto {
   @IsNumber()

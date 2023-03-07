@@ -1,1 +1,4 @@
-export class CreatePokemarketDto {}
+export class CreatePokemarketDto {
+  pokemon_id: number;
+  price: number;
+}
