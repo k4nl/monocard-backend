@@ -1,19 +1,14 @@
 import { Table, Column, Model, PrimaryKey } from 'sequelize-typescript';
 
 @Table({
-  tableName: 'users',
+  tableName: 'type_transactions',
+  timestamps: true,
 })
-export class User extends Model<User> {
+export class Typetransaction extends Model<Typetransaction> {
   @PrimaryKey
   @Column({ autoIncrement: true, unique: true, allowNull: false })
   id: number;
 
   @Column({ allowNull: false, unique: true })
   name: string;
-
-  @Column({ allowNull: false })
-  password: string;
-
-  @Column({ allowNull: false, defaultValue: 0 })
-  balance: number;
 }

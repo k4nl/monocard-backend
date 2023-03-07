@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
 import Bcrypt from 'src/utils/Bcrypt';
 import { CustomError } from 'src/utils/CustomError';
+import { UpdateUserBalanceDto } from './dto/update-user-balance.dto';
 
 @Injectable()
 export class UserService {
@@ -17,25 +18,27 @@ export class UserService {
     const response = await this.userModel.create({
       name: createUserDto.name,
       password: (await Bcrypt.hashPassword(createUserDto.password)).toString(),
+      balance: 0,
     });
     return {
       name: response.name,
       id: response.id,
+      balance: response.balance,
     };
   }
 
   async findAll() {
-    return this.userModel.findAll({ attributes: ['id', 'name'] });
+    return this.userModel.findAll({ attributes: { exclude: ['password'] } });
   }
 
   findOne(id: number) {
     return this.userModel.findOne({
       where: { id },
-      attributes: ['id', 'name'],
+      attributes: { exclude: ['password'] },
     });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async updatePassword(id: number, updateUserDto: UpdateUserDto) {
     try {
       const response = await this.userModel.update(
         {
@@ -47,6 +50,21 @@ export class UserService {
       );
       if (!response[0]) throw new CustomError(['Error updating password'], 400);
       return { message: 'Password updated' };
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async updateUserBalance(id: number, { balance }: UpdateUserBalanceDto) {
+    try {
+      const response = await this.userModel.update(
+        {
+          balance,
+        },
+        { where: { id } },
+      );
+      if (!response[0]) throw new CustomError(['Error updating balance'], 400);
+      return { message: 'Balance updated' };
     } catch (error) {
       return error;
     }
