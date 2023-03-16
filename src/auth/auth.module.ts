@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { JwtStrategy } from './jwt.strategy';
+import { AuthController } from './auth.controller';
 
 const configService = new ConfigService();
 
@@ -17,6 +18,7 @@ const configService = new ConfigService();
       secret: configService.get('JWT_SECRET'),
     }),
   ],
+  controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })

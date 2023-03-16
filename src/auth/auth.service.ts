@@ -19,7 +19,7 @@ export class AuthService {
       where: { name: username },
       attributes: ['id', 'name', 'password'],
     });
-    if (!user) return null;
+    if (!user) throw new CustomError(['Can not found user'], 400);
     const isMatch = await Bcrypt.comparePassword(pass, user.password);
     if (!isMatch) throw new CustomError(['Invalid password'], 400);
     return { name: user.name, id: user.id };
