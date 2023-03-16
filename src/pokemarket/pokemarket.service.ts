@@ -17,7 +17,7 @@ export class PokemarketService {
   ) {}
 
   async addToMarket(createPokemarketDto: CreatePokemarketDto, user: any) {
-    const pokemon = this.pokemonService.findOne(
+    const pokemon = await this.pokemonService.findOne(
       createPokemarketDto.pokemon_id,
       user,
     );

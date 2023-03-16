@@ -17,16 +17,24 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class PokemonController {
   constructor(private readonly pokemonService: PokemonService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPokemonDto: CreatePokemonDto) {
-    return this.pokemonService.create(createPokemonDto);
+  create(@Req() req: any, @Body() createPokemonDto: CreatePokemonDto) {
+    const { user } = req;
+    return this.pokemonService.create(createPokemonDto, user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  findAll(@Req() req: any, @Query() query: any) {
+  findAllByUser(@Req() req: any, @Query() query: any) {
     const { user } = req;
-    return this.pokemonService.findAll(user, query);
+    return this.pokemonService.findAllByUser(user, query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('all')
+  findAll(@Query() query: any) {
+    return this.pokemonService.findAll(query);
   }
 
   @UseGuards(JwtAuthGuard)

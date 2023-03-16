@@ -16,6 +16,19 @@ export class PokeApiService {
     }
   }
 
+  static async fetchPokemon(limit?: number, offset?: number) {
+    try {
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon?limit=${limit || 20}&offset=${
+          offset || 0
+        }`,
+      );
+      return response;
+    } catch (error) {
+      return error.response;
+    }
+  }
+
   static async getPokemonsInfo(pokemons: PokemonUserPokedexDto[]) {
     if (pokemons.length === 0) return [];
     return Promise.all(
