@@ -1,6 +1,7 @@
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SequelizeModule, SequelizeModuleOptions } from '@nestjs/sequelize';
 import { Module } from '@nestjs/common';
+
 @Module({
   imports: [
     ConfigModule.forRoot(),

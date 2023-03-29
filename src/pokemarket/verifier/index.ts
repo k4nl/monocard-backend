@@ -19,4 +19,20 @@ export default class Verifier {
       throw new CustomError(['Could not delete'], status.badRequest);
     }
   }
+
+  static hasBalance(user: any, price: number) {
+    console.log(user.balance, price);
+    if (user.balance < price) {
+      throw new CustomError(['Insufficient balance'], status.badRequest);
+    }
+  }
+
+  static buyerIsSeller(buyer: number, seller: number) {
+    if (buyer === seller) {
+      throw new CustomError(
+        ['You can not buy from yourself'],
+        status.badRequest,
+      );
+    }
+  }
 }

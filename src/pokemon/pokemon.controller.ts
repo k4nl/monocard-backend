@@ -12,6 +12,7 @@ import {
 import { PokemonService } from './pokemon.service';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import QueryParameters from 'src/utils/QueryParameters';
 
 @Controller('pokemon')
 export class PokemonController {
@@ -20,8 +21,12 @@ export class PokemonController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(@Req() req: any, @Body() createPokemonDto: CreatePokemonDto) {
-    const { user } = req;
-    return this.pokemonService.create(createPokemonDto, user);
+    try {
+      const { user } = req;
+      return this.pokemonService.create(createPokemonDto, user);
+    } catch (error) {
+      return error;
+    }
   }
 
   @UseGuards(JwtAuthGuard)
@@ -35,6 +40,20 @@ export class PokemonController {
   @Get('all')
   findAll(@Query() query: any) {
     return this.pokemonService.findAll(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('sell')
+  findAllToSell(@Req() req: any, @Query() query: any) {
+    const { user } = req;
+    return this.pokemonService.findAllToSell(user, query);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('filter')
+  findAllByFilter(@Req() req: any, @Query() query: any) {
+    const filters = new QueryParameters(query).getFilters();
+    return filters;
   }
 
   @UseGuards(JwtAuthGuard)

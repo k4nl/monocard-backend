@@ -16,7 +16,32 @@ export class AuthController {
       const { username, password } = userData;
       const user = await this.authService.validateUserLogin(username, password);
       const { token } = await this.authService.login(user);
-      return { token, message: 'Login successful' };
+      return {
+        token,
+        message: 'Login successful',
+        user_info: { id: user.id, name: user.name, balance: user.balance },
+      };
+    } catch (error) {
+      throw new ErrorException(error);
+    }
+  }
+
+  @Post('auth/register')
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @HttpCode(200)
+  async register(@Body() userData: LoginUserDto) {
+    try {
+      const { username, password } = userData;
+      const user = await this.authService.validateUserRegister(
+        username,
+        password,
+      );
+      const { token } = await this.authService.login(user);
+      return {
+        token,
+        message: 'Register successful',
+        user_info: { id: user.id, name: user.name, balance: user.balance },
+      };
     } catch (error) {
       throw new ErrorException(error);
     }

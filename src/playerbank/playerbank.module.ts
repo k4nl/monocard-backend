@@ -8,5 +8,6 @@ import { Playerbank } from './entities/playerbank.entity';
   imports: [SequelizeModule.forFeature([Playerbank])],
   controllers: [PlayerbankController],
   providers: [PlayerbankService],
+  exports: [PlayerbankService],
 })
 export class PlayerbankModule {}

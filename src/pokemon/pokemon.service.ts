@@ -5,7 +5,9 @@ import StringFunctions from 'src/utils/StringFunctions';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
 import { Pokemon } from './entities/pokemon.entity';
 import { PokeApiService } from './pokeapi.service';
+import { Pokemarket } from 'src/pokemarket/entities/pokemarket.entity';
 import Verifier from './verifier';
+import QueryParameters from 'src/utils/QueryParameters';
 
 @Injectable()
 export class PokemonService {
@@ -27,40 +29,60 @@ export class PokemonService {
 
   async findAllByUser(user: any, query: any) {
     const pagination = new Pagination(query.page, query.total).getPagination();
+    const filters = new QueryParameters(query).getFilters();
     const response = await this.pokemonModel.findAndCountAll({
       where: { user_id: user.id },
-      limit: pagination.limit,
-      offset: pagination.offset,
     });
     const formatedResponse = await PokeApiService.getPokemonsInfo(
       response.rows,
+      filters,
+      pagination,
     );
     return {
       content: formatedResponse,
       actualPage: pagination.page,
-      totalPages: Math.ceil(response.count / pagination.limit),
-      totalContent: response.count,
+      totalContent: formatedResponse.length,
     };
   }
 
   async findAll(query: any) {
     const pagination = new Pagination(query.page, query.total).getPagination();
-    const arrayPokemon = await PokeApiService.fetchPokemon(
-      30,
-      pagination.offset,
-    );
-    const pokemonsInfo = await Promise.all(
-      arrayPokemon.data.results.map(async (pokemon: any) => {
-        const pokemonId = StringFunctions.getPokemonIdFromUrl(pokemon.url);
-        const response = await PokeApiService.fetchPokemonInfo(pokemonId);
-        return response.data;
-      }),
+    const filters = new QueryParameters(query).getFilters();
+    const arrayPokemon = await PokeApiService.fetchPokemon();
+    const pokemonsInfo = await PokeApiService.getPokemonsInfo(
+      arrayPokemon.data.results,
+      filters,
+      pagination,
     );
     return {
       content: pokemonsInfo,
       actualPage: pagination.page,
-      totalPages: Math.ceil(arrayPokemon.data.count / pagination.limit),
-      totalContent: arrayPokemon.data.count,
+      totalContent: pokemonsInfo.length,
+    };
+  }
+
+  async findAllToSell(user: any, query: any) {
+    const pagination = new Pagination(query.page, query.total).getPagination();
+    const filters = new QueryParameters(query).getFilters();
+    const response = await this.pokemonModel.findAndCountAll({
+      where: {
+        user_id: user.id,
+        '$pokemarket.id$': null,
+      },
+      include: {
+        model: Pokemarket,
+        as: 'pokemarket',
+      },
+    });
+    const formatedResponse = await PokeApiService.getPokemonsInfo(
+      response.rows,
+      filters,
+      pagination,
+    );
+    return {
+      content: formatedResponse,
+      actualPage: pagination.page,
+      totalContent: formatedResponse.length,
     };
   }
 
@@ -74,6 +96,14 @@ export class PokemonService {
   async remove(id: number, user: any) {
     const response = await this.pokemonModel.destroy({
       where: { id, user_id: user.id },
+    });
+    return response;
+  }
+
+  async update(id: number, data: any, transaction?: any) {
+    const response = await this.pokemonModel.update(data, {
+      where: { id },
+      transaction: transaction || null,
     });
     return response;
   }

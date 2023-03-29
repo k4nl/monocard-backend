@@ -5,8 +5,11 @@ import {
   PrimaryKey,
   ForeignKey,
   BelongsTo,
+  HasMany,
+  HasOne,
 } from 'sequelize-typescript';
 import { User } from 'src/user/entities/user.entity';
+import { Pokemarket } from 'src/pokemarket/entities/pokemarket.entity';
 
 @Table({
   tableName: 'pokemon',
@@ -26,4 +29,7 @@ export class Pokemon extends Model<Pokemon> {
 
   @BelongsTo(() => User)
   user: User;
+
+  @HasOne(() => Pokemarket)
+  pokemarket: Pokemarket;
 }

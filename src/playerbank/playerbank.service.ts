@@ -12,11 +12,18 @@ export class PlayerbankService {
     private playerbankModel: typeof Playerbank,
   ) {}
 
-  async create(createPlayerbankDto: CreatePlayerbankDto, user: any) {
-    const response = await this.playerbankModel.create({
-      user_id: user.id,
-      ...createPlayerbankDto,
-    });
+  async create(
+    createPlayerbankDto: CreatePlayerbankDto,
+    user: any,
+    transaction?: any,
+  ) {
+    const response = await this.playerbankModel.create(
+      {
+        user_id: user.id,
+        ...createPlayerbankDto,
+      },
+      { transaction: transaction || null },
+    );
     return response;
   }
 

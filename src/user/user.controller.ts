@@ -7,12 +7,16 @@ import {
   Param,
   Delete,
   UsePipes,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ValidationPipe } from '@nestjs/common';
 import { UpdateUserBalanceDto } from './dto/update-user-balance.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { ErrorException } from 'src/error/error.exception';
 
 @Controller('user')
 export class UserController {
@@ -24,7 +28,7 @@ export class UserController {
     try {
       return this.userService.create(createUserDto);
     } catch (error) {
-      return error;
+      throw new ErrorException(error);
     }
   }
 
@@ -33,47 +37,45 @@ export class UserController {
     try {
       return this.userService.findAll();
     } catch (error) {
-      return error;
+      throw new ErrorException(error);
     }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     try {
       return this.userService.findOne(+id);
     } catch (error) {
-      return error;
+      throw new ErrorException(error);
     }
   }
 
-  @Patch(':id/password')
+  @UseGuards(JwtAuthGuard)
+  @Patch('/password')
   @UsePipes(new ValidationPipe({ transform: true }))
-  updatePassword(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  async updatePassword(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
     try {
-      return this.userService.updatePassword(+id, updateUserDto);
+      return this.userService.updatePassword(updateUserDto, req.user);
     } catch (error) {
-      return error;
+      throw new ErrorException(error);
     }
   }
 
   @Patch(':id/balance')
   @UsePipes(new ValidationPipe({ transform: true }))
-  updateUserBalance(
+  async updateUserBalance(
     @Param('id') id: string,
     @Body() updateUserBalance: UpdateUserBalanceDto,
   ) {
     try {
       return this.userService.updateUserBalance(+id, updateUserBalance);
     } catch (error) {
-      return error;
+      throw new ErrorException(error);
     }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     try {
       return this.userService.remove(+id);
     } catch (error) {

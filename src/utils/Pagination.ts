@@ -24,7 +24,6 @@ export class Pagination {
 
   calculateOffset() {
     const offset = Math.round((Number(this.page) - 1) * Number(this.total));
-    if (offset >= Number(this.total)) return Number(this.total) - 10;
     return offset;
   }
 

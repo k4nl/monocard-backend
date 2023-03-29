@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import Bcrypt from 'src/utils/Bcrypt';
 import { CustomError } from 'src/utils/CustomError';
 import { UpdateUserBalanceDto } from './dto/update-user-balance.dto';
+import Verifier from './verifier';
 
 @Injectable()
 export class UserService {
@@ -31,37 +32,38 @@ export class UserService {
     return this.userModel.findAll({ attributes: { exclude: ['password'] } });
   }
 
-  findOne(id: number) {
-    return this.userModel.findOne({
+  async findOne(id: number) {
+    const response = await this.userModel.findOne({
       where: { id },
       attributes: { exclude: ['password'] },
     });
+    Verifier.foundUser(response);
+    return response;
   }
 
-  async updatePassword(id: number, updateUserDto: UpdateUserDto) {
-    try {
-      const response = await this.userModel.update(
-        {
-          password: (
-            await Bcrypt.hashPassword(updateUserDto.password)
-          ).toString(),
-        },
-        { where: { id } },
-      );
-      if (!response[0]) throw new CustomError(['Error updating password'], 400);
-      return { message: 'Password updated' };
-    } catch (error) {
-      return error;
+  async updatePassword(updateUserDto: UpdateUserDto, user: any) {
+    const passHash = await Bcrypt.hashPassword(updateUserDto.password);
+    const response = await this.userModel.update(
+      { password: passHash },
+      { where: { id: user.id } },
+    );
+    if (!response[0]) {
+      throw new CustomError(['Error updating password'], 400);
     }
+    return { message: 'Password updated' };
   }
 
-  async updateUserBalance(id: number, { balance }: UpdateUserBalanceDto) {
+  async updateUserBalance(
+    id: number,
+    { balance }: UpdateUserBalanceDto,
+    transaction?: any,
+  ) {
     try {
       const response = await this.userModel.update(
         {
           balance,
         },
-        { where: { id } },
+        { where: { id }, transaction: transaction || null },
       );
       if (!response[0]) throw new CustomError(['Error updating balance'], 400);
       return { message: 'Balance updated' };
